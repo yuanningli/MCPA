@@ -59,14 +59,26 @@ if length(varargin) == 2  % if PCA is specified
     train_set_cond1_node2 = train_set_cond1_node2 * w_pc_cond1_node2(:,1:num_pc_node2);
     train_set_cond2_node1 = train_set_cond2_node1 * w_pc_cond2_node1(:,1:num_pc_node1);
     train_set_cond2_node2 = train_set_cond2_node2 * w_pc_cond2_node2(:,1:num_pc_node2);
+    
+    test_data_node1_cond1 = test_data_node1 * w_pc_cond1_node1(:,1:num_pc_node1);
+    test_data_node1_cond2 = test_data_node1 * w_pc_cond2_node1(:,1:num_pc_node1);
+    
+    test_data_node2_cond1 = test_data_node2 * w_pc_cond1_node2(:,1:num_pc_node2);
+    test_data_node2_cond2 = test_data_node2 * w_pc_cond2_node2(:,1:num_pc_node2);
 
     num_pc = min(num_pc_node1,num_pc_node2);
     num_cc = min(num_cc,num_pc);
+else
+    test_data_node1_cond1 = test_data_node1;
+    test_data_node1_cond2 = test_data_node1;
+    
+    test_data_node2_cond1 = test_data_node2;
+    test_data_node2_cond2 = test_data_node2;
 end
 
 % compute the CCA model
-[ccA1,ccB1,r1] = cca(train_set_cond1_node1',train_set_cond1_node2');
-[ccA2,ccB2,r2] = cca(train_set_cond2_node1',train_set_cond2_node2');
+[ccA1,ccB1,r1] = cca(train_set_cond1_node1,train_set_cond1_node2);
+[ccA2,ccB2,r2] = cca(train_set_cond2_node1,train_set_cond2_node2);
 
 % if use the builtin cca function by MATLAB
 % [ccA1,ccB1,r1] = canoncorr(train_set_cond1_node1,train_set_cond1_node2);
@@ -86,11 +98,6 @@ B_cond1 = B1 * A1'/(A1*A1' + (1e-6)*eye(size(A1,1)));
 B_cond2 = B2 * A2'/(A2*A2' + (1e-6)*eye(size(A2,1)));
 
 % project and reconstruct the testing data throught the linear mappings
-test_data_node1_cond1 = test_data_node1 * w_pc_cond1_node1(:,1:num_pc_node1);
-test_data_node1_cond2 = test_data_node1 * w_pc_cond2_node1(:,1:num_pc_node1);
-
-test_data_node2_cond1 = test_data_node2 * w_pc_cond1_node2(:,1:num_pc_node2);
-test_data_node2_cond2 = test_data_node2 * w_pc_cond2_node2(:,1:num_pc_node2);
 
 test_data_cond1_recon_node2 = test_data_node1_cond1 * A_cond1;
 test_data_cond2_recon_node2 = test_data_node1_cond2 * A_cond2;
