@@ -63,7 +63,8 @@ if length(varargin) == 2  % if PCA is specified
     num_pc = min(num_pc_node1,num_pc_node2);
     num_cc = min(num_cc,num_pc);
 end
-    
+
+% compute the CCA model
 [ccA1,ccB1,r1] = cca(train_set_cond1_node1',train_set_cond1_node2');
 [ccA2,ccB2,r2] = cca(train_set_cond2_node1',train_set_cond2_node2');
 
@@ -77,12 +78,14 @@ B1 = ccB1(:,1:num_cc);
 A2 = ccA2(:,1:num_cc);
 B2 = ccB2(:,1:num_cc);
 
+% build bi-directional linear mappings between the two ROIs using OLS
 A_cond1 = A1 * B1'/(B1*B1' + (1e-6)*eye(size(B1,1)));
 A_cond2 = A2 * B2'/(B2*B2' + (1e-6)*eye(size(B2,1)));
 
 B_cond1 = B1 * A1'/(A1*A1' + (1e-6)*eye(size(A1,1)));
 B_cond2 = B2 * A2'/(A2*A2' + (1e-6)*eye(size(A2,1)));
 
+% project and reconstruct the testing data throught the linear mappings
 test_data_node1_cond1 = test_data_node1 * w_pc_cond1_node1(:,1:num_pc_node1);
 test_data_node1_cond2 = test_data_node1 * w_pc_cond2_node1(:,1:num_pc_node1);
 
@@ -95,6 +98,8 @@ test_data_cond2_recon_node2 = test_data_node1_cond2 * A_cond2;
 test_data_cond1_recon_node1 = test_data_node2_cond1 * B_cond1;
 test_data_cond2_recon_node1 = test_data_node2_cond2 * B_cond2;
 
+% compute correlation between reconstructed data and actual testing data
+% assign classification labels to the trials
 for n = 1 : size(test_data_node1,1)
     corr_cond1_node2 = test_data_cond1_recon_node2(n,:) * test_data_node2_cond1(n,:)' / (norm(test_data_cond1_recon_node2(n,:),2) * norm(test_data_node2_cond1(n,:),2));
     corr_cond2_node2 = test_data_cond2_recon_node2(n,:) * test_data_node2_cond2(n,:)' / (norm(test_data_cond2_recon_node2(n,:),2) * norm(test_data_node2_cond2(n,:),2));
