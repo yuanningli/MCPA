@@ -1,16 +1,12 @@
-This is a sample dataset taking from fMRI recordings from human V1 and V2. 
+This is a sample dataset simulated from empirical distribution based on real fMRI data. 
 
-A PCA is performed on an independent dataset to reduce the dimensionality down to 10 in each ROI.
+A total of 2000 trials are available.
 
-A total of 1560 trials are available.
+    data_node1 (2000x20) is the data in ROI1
 
-    data_node1_val (1560x10) is the data in V1
-
-    data_node1_val (1560x10) is the data in V2
+    data_node1 (2000x10) is the data in ROI2
     
-    labels (1560x1) is the condition of each single trial, corresponding to 120 different images
-
-
+    labels (2000x1) is the condition of each single trial, with a total of 20 different categories
 
 See Yuanning Li, R. Mark Richardson, and Avniel Singh Ghuman. Multi-Connection Pattern Analysis: 
 decoding the representational content of neural communication. (submitted, in revision) 
