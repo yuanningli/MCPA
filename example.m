@@ -14,14 +14,12 @@ for n = 1 : size(labels,1)
     category2{cond}(category_cnt(cond),:) = data_node2(n,:);
 end
 
-
 %% evaluate the performance of MCPA using leave-one-out cross-validation
 
 % loop through each pair of conditions
 condidx = 1:num_conditions;
 for i = 1:length(condidx)
     for j = (i+1) : length(condidx)
-        
         data_node1_cond1 = category1{condidx(i)}(:,:);
         data_node1_cond2 = category1{condidx(j)}(:,:);
         data_node2_cond1 = category2{condidx(i)}(:,:);
@@ -56,7 +54,6 @@ for i = 1:length(condidx)
             
             % run MCPA
             [pred_tag(n), corr_cond1(n), corr_cond2(n)] = mcpa(train_set_cond1_node1,train_set_cond2_node1,train_set_cond1_node2,train_set_cond2_node2,test_vector_node1,test_vector_node2,num_cc);
-            
         end
         
         % compute the accuracy and sensitivity index d'
@@ -73,7 +70,6 @@ for i = 1:length(condidx)
         dp(i,j) = norminv(tp(i,j)) - norminv(fp(i,j));
         
         fprintf('Condition %d vs Condition %d, accuracy = %1.4f\n',i,j,acc(i,j))
-        
     end
 end
 
