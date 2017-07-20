@@ -1,8 +1,7 @@
 %% load example dataset
-load example_data.mat
+load ./data/sample_data.mat
 num_conditions = length(unique(labels));
-num_cc = 10;
-pc_thres = 50;
+num_cc = min(size(data_node1,2),size(data_node2,2));
 
 %% sort the trials according to their conditions
 category_cnt = zeros(num_conditions,1);
@@ -11,8 +10,8 @@ clear category1 category2
 for n = 1 : size(labels,1)
     cond = labels(n);
     category_cnt(cond) = category_cnt(cond) + 1;
-    category1{cond}(category_cnt(cond),:) = data_node1_val(n,:);
-    category2{cond}(category_cnt(cond),:) = data_node2_val(n,:);
+    category1{cond}(category_cnt(cond),:) = data_node1(n,:);
+    category2{cond}(category_cnt(cond),:) = data_node2(n,:);
 end
 
 
@@ -28,21 +27,10 @@ for i = 1:length(condidx)
         data_node2_cond1 = category2{condidx(i)}(:,:);
         data_node2_cond2 = category2{condidx(j)}(:,:);
         
-        mean_node1_cond1 = mean(data_node1_cond1,1);
-        mean_node1_cond2 = mean(data_node1_cond2,1);
-        mean_node2_cond1 = mean(data_node2_cond1,1);
-        mean_node2_cond2 = mean(data_node2_cond2,1);
-        
-        std_node1_cond1 = std(data_node1_cond1,0,1);
-        std_node1_cond2 = std(data_node1_cond2,0,1);
-        std_node2_cond1 = std(data_node2_cond1,0,1);
-        std_node2_cond2 = std(data_node2_cond2,0,1);
-        
         data_tags = [ones(size(data_node1_cond1,1),1); 2*ones(size(data_node1_cond2,1),1)];
         data_node1_orig = cat(1,data_node1_cond1,data_node1_cond2);
         data_node2_orig = cat(1,data_node2_cond1,data_node2_cond2);
         
-        total_test(i,j) = 0;
         pred_tag = zeros(size(data_tags));
         
         % leave-one-out cross-validation
@@ -55,9 +43,7 @@ for i = 1:length(condidx)
             train_data_node2 = data_node2_orig(train_idx,:);
             test_vector_node1 = data_node1_orig(test_idx,:);
             test_vector_node2 = data_node2_orig(test_idx,:);
-            
-            total_test(i,j) = total_test(i,j) + 1;
-            
+                        
             train_set_cond1_node1 = train_data_node1(train_tags==1,:);
             train_set_cond2_node1 = train_data_node1(train_tags==2,:);
             train_set_cond1_node2 = train_data_node2(train_tags==1,:);
@@ -86,8 +72,13 @@ for i = 1:length(condidx)
         acc(i,j) = length(find(pred_tag == data_tags)) / length(data_tags);
         dp(i,j) = norminv(tp(i,j)) - norminv(fp(i,j));
         
+        fprintf('Condition %d vs Condition %d, accuracy = %1.4f\n',i,j,acc(i,j))
+        
     end
 end
 
 mean_dp = sum(sum(dp))/nchoosek(num_conditions,2);
 mean_acc = sum(sum(acc))/nchoosek(num_conditions,2);
+
+fprintf('overall accuracy = %1.4f \n',mean_acc)
+fprintf('overall dprime = %1.4f \n',mean_dp)
